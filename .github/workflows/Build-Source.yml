@@ -126,8 +126,12 @@ jobs:
           BIN="$(find ${{ env.PATH_CACHE }} -type l -name "*-linux-gcc" -print0 | xargs -0 dirname)"
           #echo "cpp=$(find . -type l -name "*-linux-g++" | xargs -i basename {})" >> $GITHUB_ENV
           #echo "c=$(find . -type l -name "*-linux-gcc" | xargs -i basename {})" >> $GITHUB_ENV
-          sudo find $(pwd) -type f -name "*-linux-g++*" -exec ln -sf {} /usr/bin/g++ \;
-          sudo find $(pwd) -type f -name "*-linux-gcc*" -exec ln -sf {} /usr/bin/gcc \;
+          fruits=("g++" "gcc" "c++" "cpp")
+          for name in "${fruits[@]}"; do
+            find $(pwd) -type f -name "*-linux-*-${name}.*" -exec sudo ln -sf {} /usr/bin/${name} \;
+          done
+          #sudo find $(pwd) -type f -name "*-linux-g++*" -exec ln -sf {} /usr/bin/g++ \;
+          #sudo find $(pwd) -type f -name "*-linux-gcc*" -exec ln -sf {} /usr/bin/gcc \;
           ls /usr/bin
           sudo sed -i '$a\export PATH=$PATH:'"${BIN}" /etc/profile
           sudo sed -i '$a\export STAGING_DIR='"${BIN%/*}" /etc/profile

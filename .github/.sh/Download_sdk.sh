@@ -1,6 +1,6 @@
 #!/bin/bash
-Download_URL="https://downloads.openwrt.org/releases/24.10.0/targets/layerscape/armv8_64b"
-SDK_NAME="-toolchain-.*-armv8_64b_"
+Download_URL="${1}"
+SDK_NAME=""
 
 function get_state(){
 	[[ $(curl -s -o /dev/null -w "%{http_code}" -X GET ${1}) -lt 400 ]] || exit

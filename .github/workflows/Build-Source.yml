@@ -120,7 +120,7 @@ jobs:
           cd "${{ env.PATH_CACHE }}"
           if [[ $(du -s "${{ env.PATH_CACHE }}" | awk '{ print $1}') -lt 10240 ]]; then
             echo -e "\e[1;32m Start downloading the SDK \e[0m"
-            Status="$(Download_sdk ${Download_URL} ${SDK_URL_PATH})"
+            Status="$(Download_sdk ${Download_URL} ${SDK_SDK_NAME})"
             [[ -n "Status" ]] || exec
           fi
           BIN="$(find ${{ env.PATH_CACHE }} -type l -name "*-linux-gcc" -print0 | xargs -0 dirname)"

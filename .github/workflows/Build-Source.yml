@@ -99,7 +99,7 @@ jobs:
       - name: Install Dependencies
         run: |
           # DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache gettext libncurses5-dev xsltproc
-          #sudo apt-get remove gcc g++
+          sudo apt-get remove gcc g++
       
       - name: Set executable permissions
         run: |
@@ -124,8 +124,10 @@ jobs:
             [[ -n "Status" ]] || exec
           fi
           BIN="$(find ${{ env.PATH_CACHE }} -type l -name "*-linux-gcc" -print0 | xargs -0 dirname)"
-          echo "cpp=$(find . -type l -name "*-linux-g++" | xargs -i basename {})" >> $GITHUB_ENV
-          echo "c=$(find . -type l -name "*-linux-gcc" | xargs -i basename {})" >> $GITHUB_ENV
+          #echo "cpp=$(find . -type l -name "*-linux-g++" | xargs -i basename {})" >> $GITHUB_ENV
+          #echo "c=$(find . -type l -name "*-linux-gcc" | xargs -i basename {})" >> $GITHUB_ENV
+          find $(pwd) -type f -name "*-linux-g++*" -exec sudo ln -sf {} /bin/g++ \;
+          find $(pwd) -type f -name "*-linux-gcc*" -exec sudo ln -sf {} /bin/gcc \;
           sudo sed -i '$a\export PATH=$PATH:'"${BIN}" /etc/profile
           sudo sed -i '$a\export STAGING_DIR='"${BIN%/*}" /etc/profile
           echo "status=success" >> $GITHUB_OUTPUT
@@ -159,11 +161,11 @@ jobs:
             echo ${SOURCE}
             # ${{ env.CXX }} -fsigned-char ${CPP} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
             # 优化大小
-            ${{ env.cpp }} ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
+            g++ ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
           else
             SOURCE=$(find . -type f -name "*.c" -exec basename {} \;)
             echo ${SOURCE}
-            ${{ env.c }} ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} -Os
+            gcc ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} -Os
           fi
           echo "status=success" >> $GITHUB_OUTPUT
           cd -

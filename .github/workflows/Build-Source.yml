@@ -152,8 +152,8 @@ jobs:
         run: |
           source /etc/profile
           echo ${PATH}
-          echo -e "\e[1;32m "$(${{ env.cpp }}  --version | head -n 1)" \e[0m"
-          echo -e "\e[1;32m "$(${{ env.c }} --version | head -n 1)" \e[0m"
+          echo -e "\e[1;32m "$(g++  --version | head -n 1)" \e[0m"
+          echo -e "\e[1;32m "$(gcc --version | head -n 1)" \e[0m"
           cd "${{ env.SOURCE_PATH }}/${{ env.SOURCE }}"
           SOURCE=$(find . -type f -name "*.cpp" -exec basename {} \;)
           Argv="-std=c++11 -Os -s"

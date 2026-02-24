@@ -99,7 +99,7 @@ jobs:
       - name: Install Dependencies
         run: |
           # DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache gettext libncurses5-dev xsltproc
-          sudo apt-get remove gcc g++
+          # sudo apt-get remove gcc g++
       
       - name: Set executable permissions
         run: |
@@ -126,13 +126,10 @@ jobs:
           BIN="$(find ${{ env.PATH_CACHE }} -type l -name "*-linux-gcc" -print0 | xargs -0 dirname)"
           #echo "cpp=$(find . -type l -name "*-linux-g++" | xargs -i basename {})" >> $GITHUB_ENV
           #echo "c=$(find . -type l -name "*-linux-gcc" | xargs -i basename {})" >> $GITHUB_ENV
-          fruits=("g++" "gcc" "c++" "cpp")
-          for name in "${fruits[@]}"; do
-            find $(pwd) -type f -name "*-linux-*-${name}.*" -exec sudo ln -sf {} /usr/bin/${name} \;
+          file=("g++" "gcc" "c++" "cpp" "ld" "as")
+          for name in "${file[@]}"; do
+            find $(pwd) -type f -name "*-linux-*-${name}.bin" -exec sudo ln -sf {} /usr/bin/${name} \;
           done
-          #sudo find $(pwd) -type f -name "*-linux-g++*" -exec ln -sf {} /usr/bin/g++ \;
-          #sudo find $(pwd) -type f -name "*-linux-gcc*" -exec ln -sf {} /usr/bin/gcc \;
-          ls /usr/bin
           sudo sed -i '$a\export PATH=$PATH:'"${BIN}" /etc/profile
           sudo sed -i '$a\export STAGING_DIR='"${BIN%/*}" /etc/profile
           echo "status=success" >> $GITHUB_OUTPUT

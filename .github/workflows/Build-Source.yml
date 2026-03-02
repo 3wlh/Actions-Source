@@ -157,7 +157,8 @@ jobs:
           echo -e "\e[1;32m "$(g++  --version | head -n 1)" \e[0m"
           echo -e "\e[1;32m "$(gcc --version | head -n 1)" \e[0m"
           cd "${{ env.SOURCE_PATH }}/${{ env.SOURCE }}"
-          SOURCE=$(find . -type f -name "*.cpp" -exec basename {} \;)
+          # SOURCE=$(find . -type f -name "*.cpp" -exec basename {} \;)
+          SOURCE=$(find . -type f -name "*.cpp")
           Argv="-std=c++11 -Os -s"
           if [ -n "${SOURCE}" ]; then
             echo ${SOURCE}
@@ -165,7 +166,8 @@ jobs:
             # 优化大小
             g++ ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
           else
-            SOURCE=$(find . -type f -name "*.c" -exec basename {} \;)
+            # SOURCE=$(find . -type f -name "*.c" -exec basename {} \;)
+            SOURCE=$(find . -type f -name "*.c")
             echo ${SOURCE}
             gcc ${SOURCE} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} -Os
           fi

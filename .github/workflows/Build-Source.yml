@@ -47,7 +47,7 @@ env:
   UPLOAD_BIN_DIR: true
 
 jobs:
-  jod_time:
+  jod_initial:
     name: Acquisition Time
     runs-on: ubuntu-latest
     outputs:
@@ -68,7 +68,7 @@ jobs:
 
   jod_release:
     name: Build for ${{ matrix.arch }}
-    needs: jod_time
+    needs: jod_initial
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -83,7 +83,7 @@ jobs:
 
     env:
       SDK_NAME: ${{ matrix.toolchain_name }}
-      Time: ${{ needs.jod_time.outputs.time }}
+      Time: ${{ needs.jod_initial.outputs.time }}
       Build_PATH: ${{ github.workspace }}/Build
       SDK_URL_PATH: ${{ matrix.toolchain_url_path }}
     steps: 

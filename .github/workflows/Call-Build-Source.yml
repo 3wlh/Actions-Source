@@ -31,12 +31,6 @@ on:
           - page.cgi
           - sub.cgi
           - netlink
-      ssh:
-        description: |
-          是否启用SSH连接?
-        required: false
-        default: false
-        type: boolean
 
 env:
   PACKAGE_NAME: ${{ inputs.source_name }}
@@ -159,7 +153,7 @@ jobs:
           cd "${{ env.SOURCE_PATH }}/${{ env.SOURCE }}"
           # SOURCE=$(find . -type f -name "*.cpp" -exec basename {} \;)
           SOURCE=$(find . -type f -name "*.cpp")
-          Argv="-std=c++11 -Os -s"
+          Argv="-Os -s"
           if [ -n "${SOURCE}" ]; then
             echo ${SOURCE}
             # ${{ env.CXX }} -fsigned-char ${CPP} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
@@ -197,7 +191,3 @@ jobs:
           tag_name: ${{ env.PACKAGE_NAME }}
           body_path: info.md
           files: ${{ env.Build_PATH }}/*
-
-      - name: SSH connection to Actions
-        if: (inputs.ssh == true) || contains(github.event.action, 'ssh')
-        uses: mxschmitt/action-tmate@v3

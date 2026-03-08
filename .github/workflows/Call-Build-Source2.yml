@@ -238,7 +238,3 @@ jobs:
           tag_name: ${{ env.PACKAGE_NAME }}
           body_path: info.md
           files: ${{ env.PACKAGE_NAME }}/*
-
-      - name: SSH connection to Actions
-        if: (inputs.ssh == true) || contains(github.event.action, 'ssh')
-        uses: mxschmitt/action-tmate@v3

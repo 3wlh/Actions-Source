@@ -1,7 +1,7 @@
 name: Call Build Source GZ
 
 on:
-  workflow_call::
+  workflow_call:
     inputs:
       version:
         type: string

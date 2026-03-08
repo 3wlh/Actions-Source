@@ -1,6 +1,7 @@
 name: Call Build Source
+
 on:
-  workflow_call::
+  workflow_call:
     inputs:
       version:
         type: string

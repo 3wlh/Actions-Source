@@ -1,36 +1,11 @@
-name: Build and Source
-
+name: Call Build Source
 on:
-  repository_dispatch:
-  workflow_dispatch:
+  workflow_call::
     inputs:
       version:
-        description: |
-          选择 OpenWrt 版本
-        required: false
-        default: "24.10.0"
-        type: choice
-        options:
-          - 23.05.5
-          - 24.10.0
-      
+        type: string
       source_name:
-        description: |
-          选择编译源码
-        required: false
-        default: "all"
-        type: choice
-        options:
-          - all
-          - sse_msg
-          - api
-          - wxpusher
-          - sub
-          - openssl.cgi
-          - v2ray.cgi
-          - page.cgi
-          - sub.cgi
-          - netlink
+        type: string
 
 env:
   PACKAGE_NAME: ${{ inputs.source_name }}

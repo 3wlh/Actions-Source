@@ -1,0 +1,84 @@
+name: Actions Build GO 
+
+on:
+  workflow_dispatch:
+    source_name:
+      inputs:
+        description: 选择编译软件源码
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - NapCat/NapCat
+          - NapCat/NapCat_Service
+          - Photopea
+          
+env:
+  Build_PATH: "${{ github.workspace }}/Build"
+  SOURCE_PATH: "/tmp/SOURCE"
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@main
+        with:
+          go-version: "1.25"
+      
+      - name: Download and Source
+        id: source
+        if: steps.sdk.outputs.status == 'success'
+        env:
+          OPENWRT_GOLANG_COMMIT: ${{ secrets.OPENWRT_GOLANG_COMMIT }}
+        run: |
+          echo "✅ 拉取仓库：3wlh/Source"
+          git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
+          test -d "Source/GO" && mv Source/GO ./
+          test -d "GO" && rm -rf Source
+          echo "Name="$(basename ${{ inputs.source_name }})" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+          cd -
+      
+      - name: Build Source
+        id: build_source
+        env: 
+          Name: ${{ env.Name }}
+        run: |
+          echo "✅ 编译软件目录：${pwd}/${{ inputs.source_name }}"
+          echo "Time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_ENV
+          mkdir -pm ${{ env.Build_PATH }}
+          for os in linux; do
+            for arch in amd64 arm64; do
+              echo "📦 编译 $Name-$os-$arch"
+                CGO_ENABLED=0 && GOOS=$os && GOARCH=$arch && go build -ldflags "-s -w" -o ${{ env.Build_PATH }}/$Name-$os-$arch
+              done
+            done               
+            # 设置输出变量
+            if [ -d "${{ env.Build_PATH }}" ] && [ "$(ls -A ${{ env.Build_PATH }})" ]; then
+              echo "✅ 编译成功"
+              echo "status=success" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ 编译失败"
+          fi
+
+      - name: Upload as release assets
+        if: (steps.build_skopeo.outputs.status == 'success')
+        uses: ncipollo/release-action@main
+        with:
+          tag: GitHub-Actions_${{ env.Name }}
+          name: ${{ env.Name }}
+          artifacts: ${{ env.Build_PATH }}/*
+          body: |
+            ## 编译信息
+            - 编译时间：`${{ env.Time }}`
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}

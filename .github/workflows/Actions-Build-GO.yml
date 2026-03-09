@@ -64,12 +64,12 @@ jobs:
           for os in linux; do
             for arch in amd64 arm64; do
               echo "📦 编译 $Name-$os-$arch"
-              export GOOS=$os && export GOARCH=$arch && go build -ldflags "-s -w" -o ${{ env.Build_PATH }}/$Name-$os-$arch && \
-              upx -9 ${{ env.Build_PATH }}/$Name-$os-$arch
+              export GOOS=$os && export GOARCH=$arch && go build -ldflags "-s -w" -o ${{ env.Build_PATH }}/$Name-$os-$arch && \         
               done
           done               
           # 设置输出变量
           if [ -d "${{ env.Build_PATH }}" ] && [ "$(ls -A ${{ env.Build_PATH }})" ]; then
+            upx -9 ${{ env.Build_PATH }}/*
             echo "✅ 编译成功"
             echo "status=success" >> $GITHUB_OUTPUT
           else

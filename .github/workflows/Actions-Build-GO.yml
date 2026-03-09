@@ -90,7 +90,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: GitHub-Actions_${{ env.env.Name }}
+          tag_name: GitHub-Actions_${{ env.Name }}
           name: GO：${{ env.Name }}
           body: |
             ## 编译信息

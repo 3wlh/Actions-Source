@@ -89,7 +89,7 @@ jobs:
         uses: ncipollo/release-action@main
         with:
           tag: GitHub-Actions_${{ env.Name }}
-          name: ${{ env.Name }}
+          name: GO: ${{ env.Name }}
           artifacts: ${{ env.Build_PATH }}/*
           body: |
             ## 编译信息

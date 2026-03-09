@@ -1,4 +1,4 @@
-name: Call Build Source
+name: Call Build OpenWrt
 
 on:
   workflow_call:
@@ -32,7 +32,7 @@ jobs:
       - name: Delete GitHub Release
         uses: dev-drprasad/delete-tag-and-release@v1.1
         with:
-          tag_name: ${{ env.PACKAGE_NAME }}
+          tag_name: GitHub-Actions_${{ env.PACKAGE_NAME }}
           delete_release: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -164,6 +164,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.PACKAGE_NAME }}
-          body_path: info.md
+          tag_name: GitHub-Actions_${{ env.PACKAGE_NAME }}
+          name: OpenWrt：${{ env.PACKAGE_NAME }}
+          body: |
+            ## 编译信息
+            - 编译时间：`${{ env.Time }}`
           files: ${{ env.Build_PATH }}/*

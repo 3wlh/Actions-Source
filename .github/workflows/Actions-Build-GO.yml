@@ -67,9 +67,9 @@ jobs:
           done               
           # 设置输出变量
           if [ -d "${{ env.Build_PATH }}" ] && [ "$(ls -A ${{ env.Build_PATH }})" ]; then
+            upx -9 ${{ env.Build_PATH }}/*
             echo "✅ 编译成功"
             echo "status=success" >> $GITHUB_OUTPUT
-          fi
           else
             echo "❌ 编译失败"
           fi

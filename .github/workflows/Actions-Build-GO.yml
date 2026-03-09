@@ -84,18 +84,15 @@ jobs:
           delete_release: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload as release assets
-        if: (steps.build_source.outputs.status == 'success')
-        uses: ncipollo/release-action@main
+      - name: Upload to Release
+        if: steps.pack.outputs.status == 'success'
+        uses: softprops/action-gh-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: GitHub-Actions_${{ env.Name }}
-          name: GO-${{ env.Name }}
-          artifacts: ${{ env.Build_PATH }}/*
+          tag_name: GitHub-Actions_${{ env.env.Name }}
+          name: GO：${{ env.Name }}
           body: |
             ## 编译信息
             - 编译时间：`${{ env.Time }}`
-          allowUpdates: true
-          removeArtifacts: false
-          replacesArtifacts: true
-          makeLatest: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ env.Build_PATH }}/*

@@ -39,7 +39,7 @@ jobs:
           git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
           test -d "Source/GO" && mv Source/GO ./
           test -d "GO" && rm -rf Source
-          echo "Name="$(basename ${{ inputs.source_name }})" >> $GITHUB_ENV
+          echo "Name=$(basename ${{ inputs.source_name }})" >> $GITHUB_ENV
           echo "status=success" >> $GITHUB_OUTPUT
           cd -
       

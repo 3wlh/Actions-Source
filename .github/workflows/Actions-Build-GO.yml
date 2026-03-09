@@ -85,13 +85,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to Release
-        if: steps.pack.outputs.status == 'success'
+        if: (steps.build_source.outputs.status == 'success')
         uses: softprops/action-gh-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: GitHub-Actions_${{ env.env.Name }}
-          name: GO ${{ env.Name }}
+          name: GO: ${{ env.Name }}
           body: |
             ## 编译信息
             - 编译时间：`${{ env.Time }}`

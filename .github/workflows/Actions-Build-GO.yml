@@ -34,7 +34,8 @@ jobs:
           test -d "${{ env.Build_PATH }}" || mkdir -p "${{ env.Build_PATH }}"
           echo "Name=$(basename ${{ inputs.source_name }})" >> $GITHUB_ENV
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
-      
+          echo "✅ UPX版本：$(upx --version)"
+          
       - name: Download and Source
         id: source
         env:

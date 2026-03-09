@@ -32,7 +32,6 @@ jobs:
       
       - name: Download and Source
         id: source
-        if: steps.sdk.outputs.status == 'success'
         env:
           OPENWRT_GOLANG_COMMIT: ${{ secrets.OPENWRT_GOLANG_COMMIT }}
         run: |
@@ -45,6 +44,7 @@ jobs:
           cd -
       
       - name: Build Source
+        if: steps.source.status == 'success'
         id: build_source
         env: 
           Name: ${{ env.Name }}

@@ -49,7 +49,7 @@ jobs:
         env: 
           Name: ${{ env.Name }}
         run: |
-          test -d "GO/${{ inputs.source_name }" && cd "GO/${{ inputs.source_name }"
+          test -d "GO/${{ inputs.source_name }}" && cd "GO/${{ inputs.source_name }}"
           echo "Time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_ENV
           mkdir -pm 775 ${{ env.Build_PATH }}
           echo "✅ 编译软件目录：${pwd}"

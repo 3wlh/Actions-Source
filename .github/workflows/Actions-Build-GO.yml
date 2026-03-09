@@ -64,12 +64,12 @@ jobs:
               echo "📦 编译 $Name-$os-$arch"
                 CGO_ENABLED=0 && GOOS=$os && GOARCH=$arch && go build -ldflags "-s -w" -o ${{ env.Build_PATH }}/$Name-$os-$arch
               done
-            done               
-            # 设置输出变量
-            if [ -d "${{ env.Build_PATH }}" ] && [ "$(ls -A ${{ env.Build_PATH }})" ]; then
-              echo "✅ 编译成功"
-              echo "status=success" >> $GITHUB_OUTPUT
-            fi
+          done               
+          # 设置输出变量
+          if [ -d "${{ env.Build_PATH }}" ] && [ "$(ls -A ${{ env.Build_PATH }})" ]; then
+            echo "✅ 编译成功"
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
           else
             echo "❌ 编译失败"
           fi

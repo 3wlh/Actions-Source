@@ -49,7 +49,7 @@ jobs:
           cd -
           
       - name: Build Source
-        if: steps.source.status == 'success'
+        if: steps.source.outputs.status == 'success'
         id: build_source
         env: 
           Name: ${{ env.Name }}
@@ -75,7 +75,7 @@ jobs:
           fi
 
       - name: Upload as release assets
-        if: (steps.build_skopeo.outputs.status == 'success')
+        if: (steps.build_source.outputs.status == 'success')
         uses: ncipollo/release-action@main
         with:
           tag: GitHub-Actions_${{ env.Name }}

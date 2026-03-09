@@ -75,6 +75,14 @@ jobs:
           else
             echo "❌ 编译失败"
           fi
+      
+      - name: Delete GitHub Release
+        if: (steps.build_source.outputs.status == 'success')
+        uses: dev-drprasad/delete-tag-and-release@v1.1
+        with:
+          tag_name: GitHub-Actions_${{ env.Name }}
+          delete_release: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload as release assets
         if: (steps.build_source.outputs.status == 'success')

@@ -10,7 +10,7 @@ on:
         type: choice
         options:
           - all
-          - NapCat/NapCat
+          - NapCat/NapCat_Api
           - NapCat/NapCat_Service
           - Photopea
           

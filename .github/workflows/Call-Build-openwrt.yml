@@ -126,7 +126,7 @@ jobs:
           echo ${PATH}
           echo -e "\e[1;32m "$(g++  --version | head -n 1)" \e[0m"
           echo -e "\e[1;32m "$(gcc --version | head -n 1)" \e[0m"
-          cd "${{ env.SOURCE_PATH }}/${{ env.SOURCE }}"
+          cd "${{ env.SOURCE_PATH }}"
           # SOURCE=$(find . -type f -name "*.cpp" -exec basename {} \;)
           SOURCE=$(find . -type f -name "*.cpp")
           Argv="-Os -s"

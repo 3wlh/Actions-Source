@@ -2,8 +2,8 @@ name: Actions Build GO
 
 on:
   workflow_dispatch:
-    source_name:
-      inputs:
+    inputs:
+      source_name:
         description: 选择编译软件源码
         required: false
         default: "all"

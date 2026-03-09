@@ -1,4 +1,4 @@
-name: Actions Build Source
+name: Actions Build OpenWrt
 
 on:
   repository_dispatch:

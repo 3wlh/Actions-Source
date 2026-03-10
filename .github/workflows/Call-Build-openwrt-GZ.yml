@@ -65,15 +65,15 @@ jobs:
           source /etc/profile
           cd "OpenWrt/${{ env.PACKAGE }}"
           files=$(find . -type f -name "*.cpp")
-          Argv="-Os -s"
+          Argv=""
           echo "✅源码文件: ${files}"
           if [ -n "$files" ]; then
             echo "${files}"
-            g++ ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
+            g++ -Os ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           else
             files=$(find . -type f -name "*.c")
             echo ${files}
-            gcc ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
+            gcc -Os ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           fi
           echo "status=success" >> $GITHUB_OUTPUT
           cd -

@@ -3,20 +3,9 @@ name: Actions Build OpenWrt
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      method: 
-        description: |
-          编译方式选择
-        required: false
-        default: "Call-Build-Source"
-        type: choice
-        options:
-          - OpenWrt
-          - OpenWrt-GZ
-      
+    inputs:  
       version:
-        description: |
-          选择 OpenWrt 版本
+        description: 选择 OpenWrt 版本
         required: false
         default: "24.10.0"
         type: choice
@@ -25,8 +14,7 @@ on:
           - 24.10.0
       
       source_name:
-        description: |
-          选择编译源码
+        description: 选择编译源码
         required: false
         default: "all"
         type: choice
@@ -41,20 +29,17 @@ on:
           - page.cgi
           - sub.cgi
           - netlink
-          
+      
+      pack:
+        description: 是否打包(TAR.GZ)
+        default: false
+        type: boolean
+        
 jobs:
-  Call-Build-Source:
-    if: ${{ inputs.method == 'OpenWrt' }}
+  Call-Build-OpenWrt:
     uses: ./.github/workflows/Call-Build-openwrt.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
       source_name: ${{ inputs.source_name }}
-  
-  Call-Build-Source-GZ:
-    if: ${{ inputs.method == 'OpenWrt-GZ' }}
-    uses: ./.github/workflows/Call-Build-openwrt-GZ.yml
-    secrets: inherit
-    with:
-      version: ${{ inputs.version }}
-      source_name: ${{ inputs.source_name }} 
+      pack: ${{ inputs.pack }}

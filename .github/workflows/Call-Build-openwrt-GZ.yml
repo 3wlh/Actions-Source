@@ -12,8 +12,8 @@ on:
 
 env:
   PACKAGE: ${{ inputs.source_name }}
-  CACHE_PATH: /tmp/.cache
   Build_PATH: ${{ github.workspace }}/Build
+  CACHE_PATH: /tmp/.cache
   TZ: Asia/Shanghai
   UPLOAD_BIN_DIR: true
 
@@ -97,7 +97,7 @@ jobs:
         run: |
           # ✅初始化设置
           sudo timedatectl set-timezone "${TZ}"
-          echo "time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_OUTPUT
+          echo "Time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_ENV
           test -d "${{ env.PACKAGE }}" || mkdir -pm 755 "${{ env.PACKAGE }}"
 
       - name: Download ${{ env.PACKAGE }}

@@ -36,14 +36,6 @@ jobs:
       - name: Create Directories
         run: |
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
-          
-      - name: Download and Unzip ToolChain
-        # uses: 3wlh/actions/openwrt/toolchain@main
-        id: toolchain
-        with:
-          arch: ${{ matrix.arch }}
-          version: ${{ inputs.version }}
-          path: ${{ env.CACHE_PATH }}
 
       - name: Download and Source
         if: (steps.toolchain.outputs.status == 'success')

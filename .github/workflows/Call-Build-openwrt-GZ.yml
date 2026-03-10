@@ -34,6 +34,7 @@ jobs:
       
       - name: Create Directories
         run: |
+          # ✅初始化设置
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
           
       - name: Download and Unzip ToolChain
@@ -49,6 +50,7 @@ jobs:
         working-directory: ${{ env.SOURCE_PATH }}
         id: source
         run: |
+          # ✅拉取编译源码
           git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
           test -d "Source/C++/OpenWrt" && mv Source/C++/OpenWrt ./
           test -d "OpenWrt" && rm -rf Source
@@ -59,17 +61,17 @@ jobs:
         working-directory: ${{ env.SOURCE_PATH }}
         id: build
         run: |
-          source /etc/profile
-          cd "OpenWrt/${{ env.PACKAGE_NAME }}"
+          # ✅开始编译源码
+          cd "OpenWrt/${{ env.PACKAGE }}"
           files=$(find . -type f -name "*.cpp")
           Argv="-Os -s"
           if [ -n "$files" ]; then
             echo ${files}
-            g++ ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
+            g++ ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           else
             files=$(find . -type f -name "*.c")
             echo ${files}
-            gcc ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
+            gcc ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           fi
           echo "status=success" >> $GITHUB_OUTPUT
           cd -
@@ -78,8 +80,8 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.build.outputs.status == 'success' && ${{env.UPLOAD_BIN_DIR}} == 'true'
         with:
-          name: ${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
-          path: ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
+          name: ${{ env.PACKAGE }}-${{ matrix.arch }}
+          path: ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }}
 
   jod_release:
     name: Build for ${{ matrix.arch }}
@@ -90,32 +92,23 @@ jobs:
     steps:
       - name: Create Directory
         run: |
-          test -d "${{ env.PACKAGE_NAME }}" || mkdir -p "${{ env.PACKAGE_NAME }}"
-      
-      
-      
-      - name: Download ${{ env.PACKAGE_NAME }}
+          # ✅初始化设置
+          test -d "${{ env.PACKAGE }}" || mkdir -pm 755 "${{ env.PACKAGE }}"
+
+      - name: Download ${{ env.PACKAGE }}
         uses: actions/download-artifact@main
         with:
-          path: ${{ env.PACKAGE_NAME }}
+          path: ${{ env.PACKAGE }}
           merge-multiple: true
       
       - name: Package directory
         id: pack
         run: |
-          cd ${{ env.PACKAGE_NAME }}
-          tar -zcvf ${{ env.PACKAGE_NAME }}.tar.gz *
-          test -f "${{ env.PACKAGE_NAME }}.tar.gz" && echo "status=success" >> $GITHUB_OUTPUT
-          # cp -f ${{ env.PACKAGE_NAME }}.tar.gz ${{ env.PACKAGE_NAME }}/
+          cd ${{ env.PACKAGE }}
+          tar -zcvf ${{ env.PACKAGE }}.tar.gz *
+          test -f "${{ env.PACKAGE }}.tar.gz" && echo "status=success" >> $GITHUB_OUTPUT
+          # cp -f ${{ env.PACKAGE }}.tar.gz ${{ env.PACKAGE }}/
           
-      - name: Create Edit info
-        run: |
-          sudo timedatectl set-timezone "${TZ}"
-          echo "## 编译时间：\`$(date "+%Y.%m.%d_%H%M%S")\`" > info.md
-          echo "## [![Github](https://img.shields.io/badge/Release文件可在国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://ghproxy.net/)" >> info.md
-          echo "## 软件信息：" >> info.md
-          echo "* SDK版本 \`${{ inputs.version }}\`" >> info.md
-    
       - name: Delete GitHub Release
         uses: dev-drprasad/delete-tag-and-release@v1.1
         with:
@@ -132,6 +125,7 @@ jobs:
           tag_name: GitHub-Actions_${{ env.PACKAGE_NAME }}
           name: OpenWrt：${{ env.PACKAGE_NAME }}
           body: |
-            ## 编译信息
+            ## 软件信息：
             - 编译时间：`${{ env.Time }}`
+            - SDK版本: `${{ inputs.version }}`
           files: ${{ env.PACKAGE_NAME }}/*

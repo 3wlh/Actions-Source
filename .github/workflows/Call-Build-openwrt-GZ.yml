@@ -8,7 +8,7 @@ on:
       source_name:
         type: string
       pack:
-        type: bool
+        type: boolean
 
 env:
   PACKAGE: ${{ inputs.source_name }}

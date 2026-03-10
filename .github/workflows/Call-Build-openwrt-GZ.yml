@@ -52,7 +52,6 @@ jobs:
           git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
           test -d "Source/C++/OpenWrt" && mv Source/C++/OpenWrt ./
           test -d "OpenWrt" && rm -rf Source
-          ls -d OpenWrt
           echo "status=success" >> $GITHUB_OUTPUT
         
       - name: Build and Source
@@ -61,7 +60,7 @@ jobs:
         id: build
         run: |
           source /etc/profile
-          cd "${{ env.SOURCE_PATH }}/OpenWrt/${{ env.PACKAGE_NAME }}"
+          cd "OpenWrt/${{ env.PACKAGE_NAME }}"
           files=$(find . -type f -name "*.cpp")
           Argv="-Os -s"
           if [ -n "$files" ]; then

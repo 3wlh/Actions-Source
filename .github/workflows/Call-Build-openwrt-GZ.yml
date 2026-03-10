@@ -38,8 +38,8 @@ jobs:
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
           
       - name: Download and Unzip ToolChain
-        id: toolchain
         uses: 3wlh/actions/openwrt/toolchain@main
+        id: toolchain
         with:
           arch: ${{ matrix.arch }}
           version: ${{ inputs.version }}

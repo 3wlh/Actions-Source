@@ -55,17 +55,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
         
-      - name: Setup Cache
-        uses: actions/cache@main
-        with:
-          path: |
-            ${{ env.CACHE_PATH }}
-          key: ${{ matrix.arch }}-${{ env.version }}Cache
-          restore-keys: |
-            ${{ env.CACHE_PATH }}/sdk
-            ${{ env.CACHE_PATH }}/dl
-            ${{ env.CACHE_PATH }}/feeds
-      
       - name: Install Dependencies
         run: |
           # DEBIAN_FRONTEND=noninteractive sudo apt-get install -y ccache gettext libncurses5-dev xsltproc
@@ -73,89 +62,44 @@ jobs:
       
       - name: Create Directories
         run: |
-          CACHE_SDK_PATH="$(eval echo "${CACHE_PATH}/sdk")"
-          CACHE_DL_PATH="$(eval echo "${CACHE_PATH}/dl")"
-          CACHE_FEEDS_PATH="$(eval echo "${CACHE_PATH}/feeds")"
-          echo "缓存SDK目录: $CACHE_SDK_PATH"
-          echo "缓存DL目录: $CACHE_DL_PATH"
-          echo "缓存FEEDS目录: $CACHE_FEEDS_PATH"
-          test -d "$CACHE_SDK_PATH" || mkdir -p "$CACHE_SDK_PATH"
-          test -d "$CACHE_FEEDS_PATH" || mkdir -p "$CACHE_FEEDS_PATH"
-          test -d "${{ env.Build_PATH }}" || mkdir -p "${{ env.Build_PATH }}"
-          echo "CACHE_SDK_PATH=$CACHE_SDK_PATH" >> $GITHUB_ENV
-          echo "CACHE_DL_PATH=$CACHE_DL_PATH" >> $GITHUB_ENV
-          echo "CACHE_FEEDS_PATH=$CACHE_FEEDS_PATH" >> $GITHUB_ENV
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
           
       - name: Download and Unzip ToolChain
         id: toolchain
-        run: |
-          cd "${{ env.CACHE_PATH }}"
-          if [[ $(du -s "${{ env.CACHE_PATH }}" | awk '{ print $1}') -ge 6350 ]]; then
-            echo "使用缓存文件" && echo "status=success" >> $GITHUB_OUTPUT
-          else if [[ $(curl -s -o /dev/null -w "%{http_code}" -X GET ${Download_URL}/${SDK_URL_PATH}) -lt 400 ]]; then
-            if ! ( wget -qO- "${Download_URL}/${SDK_URL_PATH}/sha256sums" | grep -- "${{ env.SDK_NAME }}" > sha256sums.small 2>/dev/null ) ; then
-              echo "在sha256sums中找不到${{ env.SDK_NAME }}文件"
-            else
-              SDK_FILE="$(cat sha256sums.small | cut -d' ' -f2 | sed 's/*//g')"
-              if ! sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-                echo "Download ${Download_URL}/${SDK_URL_PATH}/${SDK_FILE}"
-                wget -qO "${SDK_FILE}" "${Download_URL}/${SDK_URL_PATH}/${SDK_FILE}" # --show-progress
-                if ！sha256sum -c ./sha256sums.small >/dev/null 2>&1 ; then
-                  echo "无法验证SDK！"
-                else
-                  file "${CACHE_PATH}/${SDK_FILE}"
-                  tar -I zstd -xf "${CACHE_PATH}/${SDK_FILE}" -C "${CACHE_SDK_PATH}" --strip=1
-                  rm -rf ${SDK_FILE}
-                  echo "status=success" >> $GITHUB_OUTPUT
-                fi
-              fi   
-            fi  
-            fi
-          fi
-          # find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-g++" -exec echo {} \;
-          # echo "CXX=$(find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-g++")" >> $GITHUB_ENV
-          # find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-gcc" -exec echo {} \;
-          echo "CC=$(find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-gcc" | xargs -i basename {})" >> $GITHUB_ENV
-          echo "CXX=$(find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-g++" | xargs -i basename {})" >> $GITHUB_ENV
-          BIN=$(find "${{ env.CACHE_SDK_PATH }}" -type l -name "*-linux-g++" -exec readlink -f {} \; | xargs -i dirname {})
-          sudo sed -i '$a\PATH=$PATH:'"${BIN}" /etc/profile
-          sudo sed -i '$a\STAGING_DIR='"${BIN}" /etc/profile
-          sudo sed -i '$a\export STAGING_DIR' /etc/profile
-          cd -
+        uses: 3wlh/actions/openwrt/toolchain
+        with:
+          arch: ${{ matrix.arch }}
+          version: ${{ inputs.version }}
+          path: ${{ env.CACHE_PATH }}
 
       - name: Download and Source
+        if: (steps.toolchain.outputs.status == 'success')
+        working-directory: ${{ env.SOURCE_PATH }}
         id: source
-        if: steps.toolchain.outputs.status == 'success'
-        env:
-          OPENWRT_GOLANG_COMMIT: ${{ secrets.OPENWRT_GOLANG_COMMIT }}
         run: |
-          cd "${{ env.SOURCE_PATH }}"
           git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
           test -d "Source/C++/OpenWrt" && mv Source/C++/OpenWrt ./
           test -d "OpenWrt" && rm -rf Source
-          # ${{ env.CXX }} -v
-          # ${{ env.CC }} -v
           echo "status=success" >> $GITHUB_OUTPUT
-          cd -
         
       - name: Build and Source
+        if: (steps.source.outputs.status == 'success')
+        working-directory: ${{ env.SOURCE_PATH }}
         id: build
-        if: steps.source.outputs.status == 'success'
         run: |
           source /etc/profile
-          cd "${{ env.SOURCE_PATH }}/${{ env.SOURCE }}"
-          CPP=$(find . -type f -name "*.cpp" -exec basename {} \;)
-          echo ${CPP}
-          if [ -n "$CPP" ]; then
-            # ${{ env.CXX }} -fsigned-char ${CPP} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
-            # 优化大小
-            ${{ env.CXX }} -Os ${CPP} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
-            # ${{ env.CXX }} ${CPP} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}
+          echo -e "\e[1;32m "✅ $(g++  --version | head -n 1)" \e[0m"
+          echo -e "\e[1;32m "✅ $(gcc --version | head -n 1)" \e[0m"
+          cd "${{ env.PACKAGE_NAME }}"
+          files=$(find . -type f -name "*.cpp")
+          Argv="-Os -s"
+          if [ -n "$files" ]; then
+            echo ${files}
+            g++ ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
           else
-            C=$(find . -type f -name "*.c" -exec basename {} \;)
-            echo ${C}
-            ${{ env.CC }} -Os ${C} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }}  
+            files=$(find . -type f -name "*.c")
+            echo ${files}
+            gcc ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE_NAME }}-${{ matrix.arch }} ${Argv}
           fi
           echo "status=success" >> $GITHUB_OUTPUT
           cd -

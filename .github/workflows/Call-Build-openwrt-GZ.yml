@@ -36,6 +36,7 @@ jobs:
         run: |
           # ✅初始化设置
           echo "SOURCE_PATH=$(mktemp -d)" >> $GITHUB_ENV
+          test -d "${{ env.Build_PATH }}" || mkdir -pm 755 "${{ env.Build_PATH }}"
           
       - name: Download and Unzip ToolChain
         uses: 3wlh/actions/openwrt/toolchain@main
@@ -65,15 +66,15 @@ jobs:
           source /etc/profile
           cd "OpenWrt/${{ env.PACKAGE }}"
           files=$(find . -type f -name "*.cpp")
-          Argv=""
+          Argv="-Os -s"
           echo "✅源码文件: ${files}"
           if [ -n "$files" ]; then
             echo "${files}"
-            g++ -Os ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
+            g++ ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           else
             files=$(find . -type f -name "*.c")
             echo ${files}
-            gcc -Os ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
+            gcc ${files} -o ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }} ${Argv}
           fi
           echo "status=success" >> $GITHUB_OUTPUT
           cd -

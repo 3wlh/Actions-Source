@@ -108,7 +108,7 @@ jobs:
       
       - name: Pack into a gz files
         working-directory: ${{ env.PACKAGE }}
-        if: (inputs.pack == 'success')
+        if: (inputs.pack == 'true')
         run: |
           if [ -d "$(pwd)" ] && [ "$(ls -A $(pwd))" ]; then
             tar -zcvf $(pwd).tar.gz *

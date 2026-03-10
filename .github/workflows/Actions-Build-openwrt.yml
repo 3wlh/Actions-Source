@@ -11,8 +11,8 @@ on:
         default: "Call-Build-Source"
         type: choice
         options:
-          - Call-Build-openwrt
-          - Call-Build-openwrt-GZ
+          - OpenWrt
+          - OpenWrt-GZ
       
       version:
         description: |
@@ -44,16 +44,16 @@ on:
           
 jobs:
   Call-Build-Source:
-    if: ${{ inputs.method == 'Call-Build-Source' }}
-    uses: ./.github/workflows/Call-Build-Source.yml
+    if: ${{ inputs.method == 'OpenWrt' }}
+    uses: ./.github/workflows/Call-Build-openwrt.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
       source_name: ${{ inputs.source_name }}
   
   Call-Build-Source-GZ:
-    if: ${{ inputs.method == 'Call-Build-Source-GZ' }}
-    uses: ./.github/workflows/Call-Build-Source-GZ.yml
+    if: ${{ inputs.method == 'OpenWrt-GZ' }}
+    uses: ./.github/workflows/Call-Build-openwrt-GZ.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}

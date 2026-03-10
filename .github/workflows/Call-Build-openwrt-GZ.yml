@@ -10,27 +10,13 @@ on:
 
 env:
   CACHE_PATH: /tmp/.cache
+  Build_PATH: ${{ github.workspace }}/Build
   PACKAGE_NAME: ${{ inputs.source_name }}
   SOURCE: OpenWrt/${{ inputs.Source_name }}/
-  Download_URL: https://downloads.openwrt.org/releases/${{ inputs.Version }}/targets
   TZ: Asia/Shanghai
   UPLOAD_BIN_DIR: true
 
 jobs:
-  jod_initial:
-    name: Acquisition initial
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Checkout
-        uses: actions/checkout@main
-        
-      - name: Delete GitHub Release
-        uses: dev-drprasad/delete-tag-and-release@v1.1
-        with:
-          tag_name: GitHub-Actions_${{ env.PACKAGE_NAME }}
-          delete_release: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
   jod_compile:
     name: Build for ${{ matrix.arch }}
     needs: jod_initial
@@ -38,19 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - arch: aarch64_generic
-            toolchain_url_path: layerscape/armv8_64b
-            toolchain_name: -toolchain-.*-armv8_64b_
-          - arch: x86_64
-            toolchain_url_path: x86/64
-            toolchain_name: -toolchain-.*-x86-64_
-
-    env:
-      SDK_NAME: ${{ matrix.toolchain_name }}
-      Time: ${{ needs.jod_initial.outputs.time }}
-      Build_PATH: ${{ github.workspace }}/Build
-      SDK_URL_PATH: ${{ matrix.toolchain_url_path }}
+        arch: [x86_64, aarch64_generic]      
     steps: 
       - name: Checkout
         uses: actions/checkout@main
@@ -121,7 +95,9 @@ jobs:
       - name: Create Directory
         run: |
           test -d "${{ env.PACKAGE_NAME }}" || mkdir -p "${{ env.PACKAGE_NAME }}"
-
+      
+      
+      
       - name: Download ${{ env.PACKAGE_NAME }}
         uses: actions/download-artifact@main
         with:
@@ -143,7 +119,14 @@ jobs:
           echo "## [![Github](https://img.shields.io/badge/Release文件可在国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://ghproxy.net/)" >> info.md
           echo "## 软件信息：" >> info.md
           echo "* SDK版本 \`${{ inputs.version }}\`" >> info.md
-
+    
+      - name: Delete GitHub Release
+        uses: dev-drprasad/delete-tag-and-release@v1.1
+        with:
+          tag_name: GitHub-Actions_${{ env.PACKAGE_NAME }}
+          delete_release: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Upload to Release
         if: steps.pack.outputs.status == 'success'
         uses: softprops/action-gh-release@master

@@ -7,6 +7,8 @@ on:
         type: string
       source_name:
         type: string
+      pack:
+        type: bool
 
 env:
   PACKAGE: ${{ inputs.source_name }}
@@ -87,15 +89,15 @@ jobs:
           path: ${{ env.Build_PATH }}/${{ env.PACKAGE }}-${{ matrix.arch }}
 
   jod_release:
-    name: Build for ${{ matrix.arch }}
+    name: Upload to Release
     needs: jod_compile
     runs-on: ubuntu-latest
-    env:
-      Time: ${{ needs.initial.outputs.time }}
     steps:
       - name: Create Directory
         run: |
           # ✅初始化设置
+          sudo timedatectl set-timezone "${TZ}"
+          echo "time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_OUTPUT
           test -d "${{ env.PACKAGE }}" || mkdir -pm 755 "${{ env.PACKAGE }}"
 
       - name: Download ${{ env.PACKAGE }}
@@ -104,16 +106,21 @@ jobs:
           path: ${{ env.PACKAGE }}
           merge-multiple: true
       
-      - name: Package directory
-        id: pack
+      - name: Pack into a gz files
+        working-directory: ${{ env.PACKAGE }}
+        if: (inputs.pack == 'success')
         run: |
-          cd ${{ env.PACKAGE }}
-          tar -zcvf ${{ env.PACKAGE }}.tar.gz *
-          test -f "${{ env.PACKAGE }}.tar.gz" && echo "status=success" >> $GITHUB_OUTPUT
-          # cp -f ${{ env.PACKAGE }}.tar.gz ${{ env.PACKAGE }}/
-          
+          if [ -d "$(pwd)" ] && [ "$(ls -A $(pwd))" ]; then
+            tar -zcvf $(pwd).tar.gz *
+          if
+      
+      - name: Check file
+        working-directory: ${{ env.PACKAGE }}
+        id: check
+        run: [[ "$(ls -A $(pwd)/${{ env.PACKAGE }})" ]] && echo "status=success" >> $GITHUB_OUTPUT
+        
       - name: Delete GitHub Release
-        if: (steps.pack.outputs.status == 'success')
+        if: (steps.check.outputs.status == 'success')
         uses: dev-drprasad/delete-tag-and-release@v1.1
         with:
           tag_name: GitHub-Actions_${{ env.PACKAGE }}
@@ -121,7 +128,7 @@ jobs:
           github_token: ${{ github.token }}
       
       - name: Upload to Release
-        if: (steps.pack.outputs.status == 'success')
+        if: (steps.check.outputs.status == 'success')
         uses: softprops/action-gh-release@master
         env:
           GITHUB_TOKEN: ${{ github.token }}

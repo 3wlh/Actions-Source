@@ -19,7 +19,6 @@ env:
 jobs:
   jod_compile:
     name: Build for ${{ matrix.arch }}
-    needs: jod_initial
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

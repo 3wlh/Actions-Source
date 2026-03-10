@@ -117,7 +117,8 @@ jobs:
       - name: Check file
         working-directory: ${{ env.PACKAGE }}
         id: check
-        run: | [[ "$(ls -A $(pwd)/${{ env.PACKAGE }})" ]] && echo "status=success" >> $GITHUB_OUTPUT
+        run: |
+          [[ "$(ls -A $(pwd))" ]] && echo "status=success" >> $GITHUB_OUTPUT
         
       - name: Delete GitHub Release
         if: (steps.check.outputs.status == 'success')

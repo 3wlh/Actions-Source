@@ -9,10 +9,9 @@ on:
         type: string
 
 env:
+  PACKAGE: ${{ inputs.source_name }}
   CACHE_PATH: /tmp/.cache
   Build_PATH: ${{ github.workspace }}/Build
-  PACKAGE_NAME: ${{ inputs.source_name }}
-  SOURCE: OpenWrt/${{ inputs.Source_name }}/
   TZ: Asia/Shanghai
   UPLOAD_BIN_DIR: true
 
@@ -57,8 +56,8 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
         
       - name: Build and Source
+        working-directory: ${{ env.SOURCE_PATH }}/${{ env.PACKAGE }}
         if: (steps.source.outputs.status == 'success')
-        working-directory: ${{ env.SOURCE_PATH }}
         id: build
         run: |
           source /etc/profile

@@ -66,7 +66,7 @@ jobs:
           
       - name: Download and Unzip ToolChain
         id: toolchain
-        uses: 3wlh/actions/openwrt/toolchain
+        uses: 3wlh/actions/openwrt/toolchain@main
         with:
           arch: ${{ matrix.arch }}
           version: ${{ inputs.version }}

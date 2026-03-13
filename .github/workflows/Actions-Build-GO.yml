@@ -49,7 +49,6 @@ jobs:
           test -d "Source/GO" && mv Source/GO $(pwd)
           test -d "GO" && rm -rf Source
           echo "status=success" >> $GITHUB_OUTPUT
-          cd -
           
       - name: Build Source
         if: (steps.source.outputs.status == 'success')

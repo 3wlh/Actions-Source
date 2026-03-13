@@ -46,7 +46,7 @@ jobs:
         run: |
           echo "✅ 拉取仓库：3wlh/Source"
           git clone --depth=1 ${url} $(pwd)/Source
-          test -d "Source/GO" && mv Source/GO .
+          test -d "Source/GO" && mv Source/GO $(pwd)
           test -d "GO" && rm -rf Source
           echo "status=success" >> $GITHUB_OUTPUT
           cd -

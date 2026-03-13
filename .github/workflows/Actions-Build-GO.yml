@@ -38,30 +38,32 @@ jobs:
           echo "✅ UPX版本：$(upx --version)"
           
       - name: Download and Source
+        working-directory: ${{ env.SOURCE_PATH }}
         id: source
         env:
           OPENWRT_GOLANG_COMMIT: ${{ secrets.OPENWRT_GOLANG_COMMIT }}
+          url: https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
         run: |
           echo "✅ 拉取仓库：3wlh/Source"
-          cd ${{ env.SOURCE_PATH }}
-          git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
-          test -d "Source/GO" && mv Source/GO ./
+          git clone --depth=1 ${url} $(pwd)/Source
+          test -d "Source/GO" && mv Source/GO .
           test -d "GO" && rm -rf Source
           echo "status=success" >> $GITHUB_OUTPUT
           cd -
           
       - name: Build Source
-        if: steps.source.outputs.status == 'success'
+        if: (steps.source.outputs.status == 'success')
+        working-directory: ${{ env.SOURCE_PATH }}
         id: build_source
         env: 
           Name: ${{ env.Name }}
         run: |
-          cd ${{ env.SOURCE_PATH }}
           test -d "GO/${{ inputs.source_name }}" && cd "GO/${{ inputs.source_name }}"
           echo "Time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_ENV
           mkdir -pm 775 ${{ env.Build_PATH }}
           echo "✅ 编译软件目录：${pwd}"
           export CGO_ENABLED=0
+          echo "✅ 下载依赖：${Name}"
           for os in linux; do
             for arch in amd64 arm64; do
               echo "📦 编译 $Name-$os-$arch"

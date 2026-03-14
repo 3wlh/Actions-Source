@@ -42,7 +42,7 @@ jobs:
         id: source
         env:
           OPENWRT_GOLANG_COMMIT: ${{ secrets.OPENWRT_GOLANG_COMMIT }}
-          url: https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
+          url: https://3wlh:${{ secrets.TOKEN_GITHUB }}@github.com/3wlh/Source
         run: |
           echo "✅ 拉取仓库：3wlh/Source"
           git clone --depth=1 ${url} $(pwd)/Source

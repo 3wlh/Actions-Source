@@ -54,7 +54,7 @@ jobs:
         id: source
         run: |
           # ✅拉取编译源码
-          git clone https://3wlh:${{ secrets.TOKEN_3WLH }}@github.com/3wlh/Source
+          git clone https://3wlh:${{ secrets.TOKEN_GITHUB }}@github.com/3wlh/Source
           test -d "Source/C++/OpenWrt" && mv Source/C++/OpenWrt ./
           test -d "OpenWrt" && rm -rf Source
           echo "status=success" >> $GITHUB_OUTPUT

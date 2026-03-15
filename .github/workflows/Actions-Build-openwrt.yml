@@ -21,6 +21,7 @@ on:
         options:
           - all
           - sse_msg
+          - docker_web
           - api
           - wxpusher
           - sub

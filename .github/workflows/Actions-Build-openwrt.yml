@@ -39,6 +39,7 @@ on:
         
 jobs:
   Call-Build-OpenWrt:
+    name: build ${{ inputs.source_name }}
     uses: ./.github/workflows/Call-Build-openwrt.yml
     secrets: inherit
     with:

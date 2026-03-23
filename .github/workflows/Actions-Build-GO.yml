@@ -61,7 +61,7 @@ jobs:
           test -d "GO/${{ inputs.source_name }}" && cd "GO/${{ inputs.source_name }}"
           echo "Time=$(date "+%Y.%m.%d_%H%M%S")" >> $GITHUB_ENV
           mkdir -pm 775 ${{ env.Build_PATH }}
-          echo "✅ 编译软件目录：${pwd}"
+          echo "✅ 编译软件目录：$(pwd)"
           export CGO_ENABLED=0
           echo "✅ 下载依赖：${Name}"
           go mod tidy && go mod download

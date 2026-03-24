@@ -20,8 +20,8 @@ on:
         type: choice
         options:
           - all
-          - sse_msg
-          - ws_msg
+          - sseconsole
+          - wsconsole
           - docker_web
           - api
           - wxpusher

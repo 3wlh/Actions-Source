@@ -31,6 +31,12 @@ jobs:
         with:
           go-version: "1.25"
       
+      - name: Install UPX
+        uses: crazy-max/ghaction-upx@v4
+        with:
+          version: 5.1.1
+          install-only: true
+      
       - name: Configure environment variables
         run: |
           test -d "${{ env.Build_PATH }}" || mkdir -p "${{ env.Build_PATH }}"
